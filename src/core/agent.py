@@ -1,11 +1,18 @@
 import pyautogui
 from clients import openrouter_client, closeai_client
-from actions import click, describe_screenshot, typing, hot_key_copy, hot_key_paste, hot_key_select_all, press_enter
-from actions import press_key
 import json
 import time
 import base64
 class Agent:
+    """
+    利用图形化界面操控cursor，实现自我迭代与优化
+    工作流程：
+    1.发送初始prompt给cursor
+    2.等待cursor完成任务
+    3.根据cursor的输出，判断是否需要继续迭代
+    4.如果需要继续迭代，则发送新的prompt
+    5.如果不需要继续迭代，则结束
+    """
     def __init__(self, agent_name:str,model: str = "gpt-5",user_input: str = None,system_prompt: str = None):
         self.agent_name = agent_name
         self.model = model
@@ -158,13 +165,17 @@ class Agent:
 if __name__ == "__main__":
   pyautogui.click(2390,20)
   time.sleep(3)
-  system_prompt = """You are a helpful assistant that can use tools to complete tasks by observing the screen and taking actions.
-  Here is some experience :
-  - 1. When you have already opened a browser, you need to find the search box(almost in the center of the screen) and search for the target website.
-  - 2. When you finish typing your query, you need to press the enter key or click the search button to submit your query.
-  
+  system_prompt = """You are a cursor(An ai coding IDE) manipulator. You are given a idea to complete. You need to use cursor to build this from scratch. What you can do are:
+  1. You can input your instruction to cursor in the input box of cursor in the right side of the screen.
+  2. You can click "send" button(a white button with an arrow icon below the input box) to send your instruction to cursor.
+  3. You follow cursor's response click "accept" or "run" to continue the task.
+  The possible workflow is:
+  1. Polish user's input and type it into the input box of cursor and submit.
+  2. If cursor is generating code, you need to **wait** for it to finish. Don't send another instruction until it's finished.
+  3. Follow cursor's response click "accept" or "run" button to continue the task.
+  4. Once the task is completed, you should run the project to see if it's working.
   """
-  user_input = "Open a browser(like edge), search 'google ai studio' and enter its official website(normally the first result). Then create a new chat and send a message: 'Hello, how are you?' to ai model"
+  user_input = """I want to use cursor to build a simple game of tic tac toe in python."""
   agent_1= Agent(agent_name="agent_1",system_prompt=system_prompt,user_input=user_input)
   agent_1.add_tool(
      {
@@ -232,17 +243,7 @@ if __name__ == "__main__":
     })
 
 
-#   system_prompt = """You are a cursor(An ai coding IDE) manipulator. You are given a idea to complete. You need to use cursor to build this from scratch. What you can do are:
-#   1. You can input your instruction to cursor in the input box of cursor in the right side of the screen.
-#   2. You can click "send" button(a white button with an arrow icon below the input box) to send your instruction to cursor.
-#   3. You follow cursor's response click "accept" or "run" to continue the task.
-#   The possible workflow is:
-#   1. Polish user's input and type it into the input box of cursor and submit.
-#   2. If cursor is generating code, you need to **wait** for it to finish. Don't send another instruction until it's finished.
-#   3. Follow cursor's response click "accept" or "run" button to continue the task.
-#   4. Once the task is completed, you should run the project to see if it's working.
-#   """
-#   user_input = """I wang to use cursor to build a simple game of tic tac toe in python."""
+
   try:
     result,messages = agent_1.run(max_iterations=20)
     print(result)

@@ -21,7 +21,7 @@ def click(click_object: str, extra_desc: str = None):
     with open(f"outputs/screenshots/{filename}", 'rb') as f:
       b64_image = base64.b64encode(f.read()).decode("utf-8")
 
-    # 4. 使用UI-TARS-1.5-7b识别截图中的浏览器图标
+    # 4. 使用UI-TARS-1.5-7b识别截图中的图标
     completion = openrouter_client.chat.completions.create(
     extra_body={},
     model="bytedance/ui-tars-1.5-7b",
