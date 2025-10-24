@@ -1,5 +1,8 @@
 # 基于图形用户界面（GUI）的 cursor manipulator
 
+## Demo:
+<video src="demo-1.mp4" width="100%" height="100%" controls="controls"></video>
+
 ## 其功能是：
 
 通过操作图形界面，操控cursor,并可实现自我迭代,完成一个真实项目
@@ -11,3 +14,4 @@
 3. 根据cursor的输出，判断是否需要继续迭代
 4. 如果需要继续迭代，则发送新的prompt
 5. 如果不需要继续迭代，则结束
+
