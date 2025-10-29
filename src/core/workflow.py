@@ -1,18 +1,13 @@
 import pyautogui
 import time
-import numpy as np
 from .clients import closeai_client, gemini_client
 import base64
 from google.genai import types
 import json
 import logging
-import os
-TIMESTAMP_REGION = (340,160,80,20)
-TERMINAL_REGION = (2050,875,450,625)
-CURSOR_REGION = (450,50,970,1180)
-SEND_ARROW_POSITION = (1378,254)
+from .constants import TIMESTAMP_REGION, TERMINAL_REGION, CURSOR_REGION, Prompts
 def enter_wait_mode():
-  """进入等待模式，等待cursor完成任务"""
+  """Enter wait mode, waiting for Cursor to complete the task"""
   while (True):
     logging.info("waiting for cursor to finish the task...")
     time.sleep(20)
@@ -20,7 +15,7 @@ def enter_wait_mode():
     pyautogui.screenshot(current_timestamp_patch,region=TIMESTAMP_REGION)
     with open(current_timestamp_patch, 'rb') as f:
       b64_image1 = base64.b64encode(f.read()).decode("utf-8")
-    prompt = f"Extract the text in this image.Return only the text, and do not include any other information."
+    prompt = Prompts.EXTRACT_TIMESTAMP
     config = types.GenerateContentConfig(
     response_mime_type="application/json"
     )
@@ -43,10 +38,10 @@ def enter_wait_mode():
       logging.info("Cursor is still generating...")
 def generate_init_prompt(user_input: str):
   logging.info("Generating initial prompt...")
-  """将用户输入转化为cursor友好的prompt"""
-  system_prompt = "Here are several rules you must follow: 1.Do not interact with humans while performing your task. 2.After each round of task completion, summarize your progress in a paragraph. Note: Do not create a new file, just place this summary in the dialog box. 3.After each round of task completion, provide a test script (usually by running a file: python file_path). Only display the script, do not engage in human-computer interaction. 4.The test result must only be in the form of printed output to the console."
+  """Convert user input into Cursor-friendly prompt"""
+  system_prompt = Prompts.SYSTEM_PROMPT
 
-  api_config_prompt=f"Here are the API configuration information you need to follow WHEN YOU NEED THEM. OpenAI API key: {os.getenv('ALTERNATIVE_OPENAI_API_KEY')} ,OpenAI API base: {os.getenv('ALTERNATIVE_OPENAI_API_BASE')},ALTERNATIVE_WECHAT_APP_ID: {os.getenv('ALTERNATIVE_WECHAT_APP_ID')} ,ALTERNATIVE_WECHAT_APP_SECRET: {os.getenv('ALTERNATIVE_WECHAT_APP_SECRET')}"
+  api_config_prompt = Prompts.api_config_template()
 
   print(api_config_prompt)
 
@@ -56,8 +51,8 @@ def generate_init_prompt(user_input: str):
 
 
 def generate_refine_prompt(user_input: str,refine_advice: str):
-  """在循环中，根据cursor的输出， refine prompt"""
-  prompt = f"Refine the user input based on the refine advice. User input at the start of this round: {user_input} Refine advice in this round: {refine_advice}Return only the refined user input, and do not include any other information."
+  """In the loop, refine prompt based on Cursor's output"""
+  prompt = Prompts.refine_prompt_template(user_input, refine_advice)
   response=closeai_client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[{"role": "user", "content": prompt}],
@@ -65,63 +60,63 @@ def generate_refine_prompt(user_input: str,refine_advice: str):
   return response.choices[0].message.content
 
 def init_request(prompt: str):
-  """第一次对cursor发起请求
-  工作流程：
-  1.点击右上角最小化按钮，切换到待测项目空间
-  2.移动鼠标指针到输入框，输入prompt
-  3.键盘敲击enter,发送prompt
+  """Make the first request to Cursor
+  Workflow:
+  1. Click the minimize button in the top-right corner to switch to the test project workspace
+  2. Move mouse pointer to input box and type the prompt
+  3. Press enter to send the prompt
   
   """
   logging.info("Initiating request...")
-  # 点击右上角最小化按钮，切换到待测项目空间
+  # Click the minimize button in the top-right corner to switch to the test project workspace
   # pyautogui.click(2390,20,duration=1)
   time.sleep(3)
-  # 移动鼠标指针到输入框，输入prompt
+  # Move mouse pointer to input box and type the prompt
   logging.info(f"Moving mouse to position (1000, 150) and clicking")
   pyautogui.click(1000,120,duration=1)
   current_pos = pyautogui.position()
   logging.info(f"Current mouse position: {current_pos}")
   time.sleep(3)
-  # 输入prompt
+  # Type the prompt
   logging.info(f"Typing prompt: {prompt[:50]}..." if len(prompt) > 50 else f"Typing prompt: {prompt}")
   pyautogui.typewrite(prompt,interval=0.1)
   time.sleep(3)
-  # 点击发送按钮，发送prompt
+  # Press send button to send the prompt
   logging.info("Pressing 'enter' key to send prompt")
   pyautogui.press("enter")
   time.sleep(3)
   logging.info("Request sent successfully")
 
 def request_in_the_loop(prompt: str):
-  """在循环中，对cursor发起请求
-  工作流程：
-  1.把控制台信息粘贴到输入框
-  2.把prompt输入到输入框
-  3.点击发送按钮
+  """Make request to Cursor in the loop
+  Workflow:
+  1. Paste console information to input box
+  2. Type prompt to input box
+  3. Click send button
   """
   logging.info("Starting request in the loop...")
-  # 复制控制台信息
+  # Copy console information
   copy_terminal_info()
-  # 移动鼠标指针到聊天框输入框
+  # Move mouse pointer to chat input box
   logging.info(f"Moving mouse to position (1300, 1400) and clicking")
   pyautogui.click(1300,1400,duration=1)
   current_pos = pyautogui.position()
   logging.info(f"Current mouse position: {current_pos}")
   time.sleep(3)
-  # 输出请求前缀
-  logging.info("Typing prefix: 'This is the result of the test scripts in the terminal: '")
-  pyautogui.typewrite("This is part result of the test scripts in the terminal: ",interval=0.1)
+  # Output request prefix
+  logging.info(f"Typing prefix: '{Prompts.TEST_RESULT_PREFIX}'")
+  pyautogui.typewrite(Prompts.TEST_RESULT_PREFIX,interval=0.1)
   time.sleep(1)
-  # 粘贴信息
+  # Paste information
   logging.info("Pressing 'Ctrl+V' to paste terminal info")
   pyautogui.hotkey("ctrl", "v")
   time.sleep(3)
   logging.info("Pasted the copied text to the chat")
-  # 输入prompt
+  # Type the prompt
   logging.info(f"Typing refined prompt: {prompt[:50]}..." if len(prompt) > 50 else f"Typing refined prompt: {prompt}")
   pyautogui.typewrite(prompt,interval=0.1)
   time.sleep(3)
-  # 键盘敲击enter,发送prompt
+  # Press enter to send the prompt
   logging.info("Pressing 'enter' key to send prompt")
   pyautogui.press("enter")
   time.sleep(3)
@@ -129,14 +124,14 @@ def request_in_the_loop(prompt: str):
 
 
 def extract_unit_test_script():
-  """从cursor的输出中提取单元测试脚本"""
+  """Extract unit test script from Cursor's output"""
   logging.info("Extracting unit test script...")
   file_path = f'statics/img_{time.time()}.png'
   logging.info(f"Taking screenshot of CURSOR_REGION {CURSOR_REGION} and saving to {file_path}")
   pyautogui.screenshot(file_path,region=CURSOR_REGION)
   with open(file_path, 'rb') as f:
     b64_image = base64.b64encode(f.read()).decode("utf-8")
-  prompt = f"Extract the unit test script from the screenshot. Common unit test scripts are usually by running a file like this: python file_path.py. Return only the script without quotation marks."
+  prompt = Prompts.EXTRACT_UNIT_TEST
   logging.info("Sending screenshot to Gemini for unit test script extraction")
   config = types.GenerateContentConfig(
   response_mime_type="application/json"
@@ -156,14 +151,14 @@ def extract_unit_test_script():
   logging.info(f"Successfully extracted unit test script: {extracted_script}")
   return extracted_script
 def extract_cursor_output():
-  """提取cursor的输出,主要提取总结信息"""
+  """Extract Cursor's output, mainly extract summary information"""
   logging.info("Extracting cursor output...")
   file_path = f'statics/img_{time.time()}.png'
   logging.info(f"Taking screenshot of CURSOR_REGION {CURSOR_REGION} and saving to {file_path}")
   pyautogui.screenshot(file_path,region=CURSOR_REGION)
   with open(file_path, 'rb') as f:
     b64_image = base64.b64encode(f.read()).decode("utf-8")
-  prompt = f"Extract the cursor summary information from the screenshot. Return only the summary information, and do not include any other information."
+  prompt = Prompts.EXTRACT_CURSOR_OUTPUT
   logging.info("Sending screenshot to Gemini for cursor output extraction")
   config = types.GenerateContentConfig(
   response_mime_type="application/json"
@@ -183,15 +178,15 @@ def extract_cursor_output():
   return response.text
 
 def copy_terminal_info():
-  """复制终端的信息
-  工作流程：
-  1.移动鼠标指针到终端界面右下角
-  2.持续点击鼠标左键，滑动到终端左上角，选中全部信息，松开鼠标
-  3.双击右键
-  4.选择"复制"
+  """Copy terminal information
+  Workflow:
+  1. Move mouse pointer to bottom-right corner of terminal
+  2. Click and hold left mouse button, drag to top-left corner of terminal to select all, release mouse
+  3. Double right-click
+  4. Select "Copy"
   """
   logging.info("Copying terminal info...")
-  # 移动鼠标指针到终端界面右下角
+  # Move mouse pointer to bottom-right corner of terminal
   bottom_right_x = TERMINAL_REGION[0]+TERMINAL_REGION[2]
   bottom_right_y = TERMINAL_REGION[1]+TERMINAL_REGION[3]
   logging.info(f"Moving mouse to terminal bottom-right corner ({bottom_right_x}, {bottom_right_y}) and clicking")
@@ -199,7 +194,7 @@ def copy_terminal_info():
   current_pos = pyautogui.position()
   logging.info(f"Current mouse position: {current_pos}")
   time.sleep(3)
-  # 持续点击鼠标左键，滑动到终端左上角，选中全部信息，松开鼠标
+  # Click and hold left mouse button, drag to top-left corner to select all, release mouse
   top_left_x = TERMINAL_REGION[0]
   top_left_y = TERMINAL_REGION[1]
   logging.info(f"Dragging mouse from ({bottom_right_x}, {bottom_right_y}) to terminal top-left corner ({top_left_x}, {top_left_y})")
@@ -207,7 +202,7 @@ def copy_terminal_info():
   current_pos = pyautogui.position()
   logging.info(f"Current mouse position after drag: {current_pos}")
   time.sleep(3)
-  # 双击右键
+  # Double right-click
   right_click_x = TERMINAL_REGION[0]+200
   right_click_y = TERMINAL_REGION[1]+200
   logging.info(f"Double right-clicking at position ({right_click_x}, {right_click_y})")
@@ -215,7 +210,7 @@ def copy_terminal_info():
   current_pos = pyautogui.position()
   logging.info(f"Current mouse position: {current_pos}")
   time.sleep(3)
-  # 选择"复制"
+  # Select "Copy"
   copy_option_x = TERMINAL_REGION[0]+200+100
   copy_option_y = TERMINAL_REGION[1]+200+165
   logging.info(f"Clicking 'Copy' option at position ({copy_option_x}, {copy_option_y})")
@@ -228,13 +223,13 @@ def copy_terminal_info():
 
 
 def extract_terminal_info():
-  """提取终端的信息"""
+  """Extract terminal information"""
   logging.info("Extracting terminal info...")
   file_path = f'statics/img_{time.time()}.png'
   pyautogui.screenshot(file_path,region=TERMINAL_REGION)
   with open(file_path, 'rb') as f:
     b64_image = base64.b64encode(f.read()).decode("utf-8")
-  prompt = f"Extract the terminal information from the screenshot. Return only the terminal information, and do not include any other information."
+  prompt = Prompts.EXTRACT_TERMINAL_INFO
   config = types.GenerateContentConfig(
   response_mime_type="application/json"
   )
@@ -254,8 +249,8 @@ def extract_terminal_info():
 
 
 def generate_refine_advice(user_input: str,cursor_main_output: str,terminal_info: str):
-  """生成"continue/stop"和改良建议"""
-  prompt = f"Generate 'continue/stop' and refine advice based on the user input, cursor main output, and terminal information. User input: {user_input} Cursor main output in this round: {cursor_main_output} Terminal information in this round: {terminal_info} Refine advice focuses on : what else I can do to make the project better. It should be a paragraph. Return your response in the following JSON format: {{ 'action': 'continue' or 'stop', 'advice': 'your detailed refine advice here' }}"
+  """Generate 'continue/stop' and refine advice"""
+  prompt = Prompts.generate_refine_advice_template(user_input, cursor_main_output, terminal_info)
   logging.info("Generating refine advice...")
   responce=closeai_client.chat.completions.create(
     model="gpt-4o-mini",
@@ -266,12 +261,12 @@ def generate_refine_advice(user_input: str,cursor_main_output: str,terminal_info
   logging.info("Generated refine advice")
   return result["action"],result["advice"]
 def conduct_unit_test(unit_test_script: str):
-  """在终端进行单元测试
-  工作流程：
-  1.鼠标移动到terminal界面并单击
-  2.按ctrl+c
-  3.输入单元测试脚本
-  4.按回车键执行
+  """Conduct unit test in terminal
+  Workflow:
+  1. Move mouse to terminal interface and click
+  2. Press ctrl+c
+  3. Type unit test script
+  4. Press enter to execute
   """
   logging.info(f"Conducting unit test with script: {unit_test_script}")
   terminal_click_x = TERMINAL_REGION[0]+TERMINAL_REGION[2]
@@ -281,11 +276,11 @@ def conduct_unit_test(unit_test_script: str):
   current_pos = pyautogui.position()
   logging.info(f"Current mouse position: {current_pos}")
   time.sleep(1)
-  # 按ctrl+c
+  # Press ctrl+c
   logging.info("Pressing 'ctrl+c' to refresh terminal")
   pyautogui.hotkey("ctrl", "c")
   time.sleep(1)
-  # 如果unit_test_script被引号包裹，则去掉引号
+  # If unit_test_script is wrapped in quotes, remove them
   if unit_test_script.startswith("\"") and unit_test_script.endswith("\""):
     unit_test_script = unit_test_script[1:-1]
     logging.info(f"Removed quotes from script, now: {unit_test_script}")
@@ -304,7 +299,7 @@ def conduct_unit_test(unit_test_script: str):
 
 
 def workflow(user_input: str):
-  """自我迭代地操控cursor，完成任务"""
+  """Self-iteratively control Cursor to complete tasks"""
   round_count = 1
   init_prompt = generate_init_prompt(user_input)
   init_request(init_prompt)
@@ -313,24 +308,22 @@ def workflow(user_input: str):
       break
     logging.info(f"Round {round_count} starts")
     round_count += 1
-    # 进入等待模式，等待cursor完成任务
+    # Enter wait mode, waiting for Cursor to complete the task
     enter_wait_mode()
-    # cursor输出完毕，进行测试
+    # Cursor output completed, conduct testing
     cursor_main_output = extract_cursor_output()
     unit_test_script = extract_unit_test_script()
     conduct_unit_test(unit_test_script)
     terminal_info=extract_terminal_info()
-    # 决定是否继续循环
+    # Decide whether to continue the loop
     action,refine_advice = generate_refine_advice(user_input,cursor_main_output,terminal_info)
     if action == "stop":
       break
     else:
-      # 继续优化prompt，并重新请求cursor进行下一轮迭代
+      # Continue to optimize prompt and request Cursor for the next iteration
       prompt = generate_refine_prompt(user_input,refine_advice)
       request_in_the_loop(prompt)
 
   logging.info("Task completed")
-  return "任务完成"
+  return "Task completed"
 
-if __name__ == "__main__":
-   pass

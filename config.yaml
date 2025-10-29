@@ -1,0 +1,28 @@
+# Auto-Cursor Configuration File
+
+# Screen Region Configuration
+# Format: [x, y, width, height]
+# x, y: Top-left corner coordinates of the region
+# width, height: Width and height of the region
+
+# Timestamp region (used to detect if Cursor has finished the task)
+timestamp_region:
+  x: 340
+  y: 160
+  width: 80
+  height: 20
+
+# Terminal region (used to capture terminal output)
+terminal_region:
+  x: 2050
+  y: 875
+  width: 450
+  height: 625
+
+# Cursor window region (used to capture Cursor's output)
+cursor_region:
+  x: 450
+  y: 50
+  width: 970
+  height: 1180
+

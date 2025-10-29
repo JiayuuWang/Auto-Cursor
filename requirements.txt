@@ -1,0 +1,17 @@
+# Auto-Cursor Project Dependencies
+
+# GUI Automation
+pyautogui
+
+# Google Gemini API
+google-genai
+
+# OpenAI API
+openai
+
+# YAML Configuration File Parser
+PyYAML
+
+# Other Dependencies
+pillow
+
