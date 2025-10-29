@@ -1,15 +1,16 @@
 import pyautogui
 import time
 import numpy as np
-from .clients import openrouter_client, closeai_client, gemini_client
+from .clients import closeai_client, gemini_client
 import base64
 from google.genai import types
 import json
 import logging
+import os
 TIMESTAMP_REGION = (340,160,80,20)
-TERMINAL_REGION = (1450,850,1050,650)
+TERMINAL_REGION = (2050,875,450,625)
 CURSOR_REGION = (450,50,970,1180)
-
+SEND_ARROW_POSITION = (1378,254)
 def enter_wait_mode():
   """进入等待模式，等待cursor完成任务"""
   while (True):
@@ -45,9 +46,13 @@ def generate_init_prompt(user_input: str):
   """将用户输入转化为cursor友好的prompt"""
   system_prompt = "Here are several rules you must follow: 1.Do not interact with humans while performing your task. 2.After each round of task completion, summarize your progress in a paragraph. Note: Do not create a new file, just place this summary in the dialog box. 3.After each round of task completion, provide a test script (usually by running a file: python file_path). Only display the script, do not engage in human-computer interaction. 4.The test result must only be in the form of printed output to the console."
 
+  api_config_prompt=f"Here are the API configuration information you need to follow WHEN YOU NEED THEM. OpenAI API key: {os.getenv('ALTERNATIVE_OPENAI_API_KEY')} ,OpenAI API base: {os.getenv('ALTERNATIVE_OPENAI_API_BASE')},ALTERNATIVE_WECHAT_APP_ID: {os.getenv('ALTERNATIVE_WECHAT_APP_ID')} ,ALTERNATIVE_WECHAT_APP_SECRET: {os.getenv('ALTERNATIVE_WECHAT_APP_SECRET')}"
+
+  print(api_config_prompt)
+
   user_prompt = f"User input: {user_input}"
 
-  return system_prompt+user_prompt
+  return system_prompt+user_prompt+api_config_prompt
 
 
 def generate_refine_prompt(user_input: str,refine_advice: str):
@@ -105,7 +110,7 @@ def request_in_the_loop(prompt: str):
   time.sleep(3)
   # 输出请求前缀
   logging.info("Typing prefix: 'This is the result of the test scripts in the terminal: '")
-  pyautogui.typewrite("This is the result of the test scripts in the terminal: ",interval=0.1)
+  pyautogui.typewrite("This is part result of the test scripts in the terminal: ",interval=0.1)
   time.sleep(1)
   # 粘贴信息
   logging.info("Pressing 'Ctrl+V' to paste terminal info")
@@ -264,8 +269,9 @@ def conduct_unit_test(unit_test_script: str):
   """在终端进行单元测试
   工作流程：
   1.鼠标移动到terminal界面并单击
-  2.输入单元测试脚本
-  3.按回车键执行
+  2.按ctrl+c
+  3.输入单元测试脚本
+  4.按回车键执行
   """
   logging.info(f"Conducting unit test with script: {unit_test_script}")
   terminal_click_x = TERMINAL_REGION[0]+TERMINAL_REGION[2]
@@ -274,7 +280,11 @@ def conduct_unit_test(unit_test_script: str):
   pyautogui.click(terminal_click_x, terminal_click_y, duration=1)
   current_pos = pyautogui.position()
   logging.info(f"Current mouse position: {current_pos}")
-  time.sleep(3)
+  time.sleep(1)
+  # 按ctrl+c
+  logging.info("Pressing 'ctrl+c' to refresh terminal")
+  pyautogui.hotkey("ctrl", "c")
+  time.sleep(1)
   # 如果unit_test_script被引号包裹，则去掉引号
   if unit_test_script.startswith("\"") and unit_test_script.endswith("\""):
     unit_test_script = unit_test_script[1:-1]
@@ -284,7 +294,7 @@ def conduct_unit_test(unit_test_script: str):
   time.sleep(3)
   logging.info("Pressing 'enter' key to execute unit test script")
   pyautogui.press("enter")
-  time.sleep(10)
+  time.sleep(60)
   logging.info("Unit test execution completed")
   return f"conducted the unit test"
 
@@ -322,7 +332,5 @@ def workflow(user_input: str):
   logging.info("Task completed")
   return "任务完成"
 
-
 if __name__ == "__main__":
-  time.sleep(5)
-  copy_terminal_info()
+   pass

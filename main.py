@@ -48,7 +48,7 @@ def main():
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-      logging.FileHandler('workflow.log', encoding='utf-8'),
+      logging.FileHandler(f'outputs/workflow_{time.time()}.log', encoding='utf-8'),
       logging.StreamHandler(sys.stdout)
     ]
   )
@@ -73,7 +73,7 @@ def main():
   logging.info("="*60)
   
   # 将鼠标移动到安全位置
-  pyautogui.moveTo(20, 20)
+  pyautogui.moveTo(200, 200)
 
 if __name__ == "__main__":
   main()
