@@ -7,22 +7,22 @@
 
 # Timestamp region (used to detect if Cursor has finished the task)
 timestamp_region:
-  x: 340
-  y: 160
-  width: 80
-  height: 20
+  x: <YOUR_TIMESTAMP_X_COORDINATE> # For example: 340
+  y: <YOUR_TIMESTAMP_Y_COORDINATE> # For example: 160
+  width: <YOUR_TIMESTAMP_WIDTH> # For example: 80
+  height: <YOUR_TIMESTAMP_HEIGHT> # For example: 20
 
 # Terminal region (used to capture terminal output)
 terminal_region:
-  x: 2050
-  y: 875
-  width: 450
-  height: 625
+  x: <YOUR_TERMINAL_X_COORDINATE> # For example: 2050
+  y: <YOUR_TERMINAL_Y_COORDINATE> # For example: 875
+  width: <YOUR_TERMINAL_WIDTH> # For example: 450
+  height: <YOUR_TERMINAL_HEIGHT> # For example: 625
 
 # Cursor window region (used to capture Cursor's output)
 cursor_region:
-  x: 450
-  y: 50
-  width: 970
-  height: 1180
+  x: <YOUR_CURSOR_X_COORDINATE> # For example: 450
+  y: <YOUR_CURSOR_Y_COORDINATE> # For example: 50
+  width: <YOUR_CURSOR_WIDTH> # For example: 970
+  height: <YOUR_CURSOR_HEIGHT> # For example: 1180
 

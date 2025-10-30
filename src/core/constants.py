@@ -3,10 +3,8 @@ import yaml
 import os
 from pathlib import Path
 
-# Get project root directory
 ROOT_DIR = Path(__file__).parent.parent.parent
 
-# Load configuration file
 CONFIG_PATH = ROOT_DIR / "config.yaml"
 
 def load_config():
@@ -22,10 +20,8 @@ def load_config():
     
     return config
 
-# Load configuration
 _config = load_config()
 
-# Region configuration
 def _get_region_tuple(region_config):
     """Convert region in configuration to tuple format"""
     return (
@@ -39,11 +35,9 @@ TIMESTAMP_REGION = _get_region_tuple(_config['timestamp_region'])
 TERMINAL_REGION = _get_region_tuple(_config['terminal_region'])
 CURSOR_REGION = _get_region_tuple(_config['cursor_region'])
 
-# Prompt templates
 class Prompts:
     """Prompt templates"""
     
-    # System prompt
     SYSTEM_PROMPT = (
         "Here are several rules you must follow: "
         "1.Do not interact with humans while performing your task. "
@@ -54,32 +48,27 @@ class Prompts:
         "4.The test result must only be in the form of printed output to the console."
     )
     
-    # Extract timestamp text
     EXTRACT_TIMESTAMP = (
         "Extract the text in this image."
         "Return only the text, and do not include any other information."
     )
     
-    # Extract unit test script
     EXTRACT_UNIT_TEST = (
         "Extract the unit test script from the screenshot. "
         "Common unit test scripts are usually by running a file like this: python file_path.py. "
         "Return only the script without quotation marks."
     )
     
-    # Extract Cursor output
     EXTRACT_CURSOR_OUTPUT = (
         "Extract the cursor summary information from the screenshot. "
         "Return only the summary information, and do not include any other information."
     )
     
-    # Extract terminal information
     EXTRACT_TERMINAL_INFO = (
         "Extract the terminal information from the screenshot. "
         "Return only the terminal information, and do not include any other information."
     )
     
-    # Refine advice
     @staticmethod
     def refine_prompt_template(user_input: str, refine_advice: str) -> str:
         """Generate refined prompt"""
@@ -90,7 +79,6 @@ class Prompts:
             f"Return only the refined user input, and do not include any other information."
         )
     
-    # Generate refine advice
     @staticmethod
     def generate_refine_advice_template(user_input: str, cursor_output: str, terminal_info: str) -> str:
         """Generate refine advice prompt"""
@@ -106,7 +94,6 @@ class Prompts:
             f"{{ 'action': 'continue' or 'stop', 'advice': 'your detailed refine advice here' }}"
         )
     
-    # API configuration prompt
     @staticmethod
     def api_config_template() -> str:
         """Generate API configuration prompt"""
@@ -117,7 +104,6 @@ class Prompts:
             f"ALTERNATIVE_WECHAT_APP_ID: {os.getenv('ALTERNATIVE_WECHAT_APP_ID')} ,"
             f"ALTERNATIVE_WECHAT_APP_SECRET: {os.getenv('ALTERNATIVE_WECHAT_APP_SECRET')}"
         )
-    
-    # Test result prefix
+
     TEST_RESULT_PREFIX = "This is part result of the test scripts in the terminal: "
 

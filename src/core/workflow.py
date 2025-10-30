@@ -31,7 +31,7 @@ def enter_wait_mode():
       config=config
     )
     text = response.text
-    if "AM" in text or "PM" in text:
+    if "AM" in text or "PM" in text or text!="":
       logging.info("Cursor has finished the task")
       break
     else:
