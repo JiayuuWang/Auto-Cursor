@@ -63,11 +63,14 @@ GEMINI_API_BASE=... # Optional
 ### Configuring Screen Regions
 Auto-Cursor relies on precise pixel regions defined in `config.yaml`. Each region captures a specific UI component:
 - `timestamp_region`: detects when Cursor stops responding.
+
 !<img src="statics/timestamp-region.png" width="400">
 - `terminal_region`: collects CLI outputs for inspection.
+
 !<img src="statics/terminal-region.png" width="400">
 - `cursor_region`: reads Cursor’s chat summary and 
 unit-test prompts.
+
 !<img src="statics/cursor-region.png" width="400">
 Follow the steps below to tailor the regions to your own setup.
 
@@ -207,10 +210,13 @@ GEMINI_API_BASE=... # 可选
 ### REGION 配置详解
 `config.yaml` 中的三个区域决定了截屏与自动化的准确性：
 - `timestamp_region`：判断 Cursor 是否完成当前步骤。
+
 !<img src="statics/timestamp-region.png" width="400">
 - `terminal_region`：读取终端输出来评估测试结果。
+
 !<img src="statics/terminal-region.png" width="400">
 - `cursor_region`：解析 Cursor 对话中的摘要与单测脚本。
+
 !<img src="statics/cursor-region.png" width="400">
 
 #### 1. 坐标系认识
