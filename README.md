@@ -1,6 +1,6 @@
 # Auto-Cursor — A GUI-based Cursor Manipulator
 
-<video src="statics/demo-1.mp4" width="100%" height="100%" controls="controls"></video>
+![Demo Video](https://github.com/JiayuuWang/Auto-Cursor/blob/main/statics/demo-1.mp4)
 
 [English](#english-version) | [中文](#中文版本)
 
@@ -72,6 +72,7 @@ Auto-Cursor relies on precise pixel regions defined in `config.yaml`. Each regio
 unit-test prompts.
 
 !<img src="statics/cursor-region.png" width="400">
+
 Follow the steps below to tailor the regions to your own setup.
 
 #### 1. Understand the Coordinate System
@@ -142,8 +143,6 @@ cursor_region:
 
 ### Contributing & Community
 - Read `CONTRIBUTING.md` for development workflow guidance.
-- Refer to `CODE_OF_CONDUCT.md` to keep the community welcoming.
-- Report security concerns privately following `SECURITY.md`.
 
 ### License
 Auto-Cursor is released under the MIT License. See `LICENSE` for details.

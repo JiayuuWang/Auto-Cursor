@@ -12,6 +12,9 @@ openai
 # YAML Configuration File Parser
 PyYAML
 
+# Environment Variables
+python-dotenv
+
 # Other Dependencies
 pillow
 
