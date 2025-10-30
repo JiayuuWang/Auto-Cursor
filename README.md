@@ -1,6 +1,6 @@
 # Auto-Cursor — A GUI-based Cursor Manipulator
 
-![Demo Video](https://github.com/JiayuuWang/Auto-Cursor/blob/main/statics/demo-1.mp4)
+https://github.com/user-attachments/assets/64d83431-2287-48e6-b202-f80cffe23cf7
 
 [English](#english-version) | [中文](#中文版本)
 
