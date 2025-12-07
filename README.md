@@ -7,7 +7,7 @@ https://github.com/user-attachments/assets/64d83431-2287-48e6-b202-f80cffe23cf7
 ## English Version
 
 ### Overview
-Auto-Cursor is a GUI-native orchestration layer that pilots the Cursor IDE like a human operator. By combining large language models, visual grounding, and deterministic automation, the project explores how agents can build software without being confined to command-line tooling.
+Auto-Cursor is **THE FIRST** (to the best of my knowledge) GUI-native orchestration layer that pilots the Cursor IDE like a human operator. By combining large language models, visual grounding, and deterministic automation, the project explores how agents can build software without being confined to command-line tooling via graphic user interfaces.
 
 ### Why Through GUI?
 1. **Human-parity reach**: Command-line automation is capped by the APIs that tools expose. A GUI agent, however, can click, type, drag, and navigate any surface that a human can. This dramatically widens the solution space—if a person can operate it, an agent can learn to operate it too, opening the door to automating entire product lifecycles.
@@ -38,11 +38,11 @@ Auto-Cursor is a GUI-native orchestration layer that pilots the Cursor IDE like 
 - Python 3.9+
 - Windows/macOS/Linux desktop with Cursor IDE installed
 - LLM provider key: OpenAI, OpenRouter, or Gemini
-- A stable display layout (avoid moving the Cursor window while running the workflow)
+- A stable display layout (**avoid moving the Cursor window** while running the workflow)
 
 #### Installation
 ```bash
-git clone https://github.com/<your-username>/Auto-Cursor.git
+git clone https://github.com/JiayuuWang/Auto-Cursor.git
 cd Auto-Cursor
 python -m venv .venv
 .venv\Scripts\activate  # Windows
@@ -152,7 +152,7 @@ Auto-Cursor is released under the MIT License. See `LICENSE` for details.
 ## 中文版本
 
 ### 项目概览
-Auto-Cursor 是一个 GUI 原生的“人机协同层”，它像真人一样操作 Cursor IDE。通过结合大语言模型、视觉识别与确定性自动化，该项目探索如何在不依赖命令行工具的情况下，让智能体完成真实的软件开发任务。
+Auto-Cursor 是**第一个** GUI 原生的“人机协同层”，它像真人一样操作 Cursor IDE。通过结合大语言模型、视觉识别与确定性自动化，该项目探索如何在不依赖命令行工具的情况下，让智能体通过GUI完成真实的软件开发任务。
 
 ### 为什么选择 GUI？
 1. **突破 CLI 上限**：命令行自动化受限于各工具暴露的接口，而 GUI 智能体可以点击、输入、拖拽并导航任何界面。只要人能操作的地方，智能体也能学会操作，从而拓展出几乎无限的解决空间。
@@ -187,7 +187,7 @@ Auto-Cursor 是一个 GUI 原生的“人机协同层”，它像真人一样操
 
 #### 安装步骤
 ```bash
-git clone https://github.com/<your-username>/Auto-Cursor.git
+git clone https://github.com/JiayuuWang/Auto-Cursor.git
 cd Auto-Cursor
 python -m venv .venv
 .venv\Scripts\activate  # Windows
